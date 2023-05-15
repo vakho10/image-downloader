@@ -25,6 +25,7 @@ public class ImageDownloader implements Runnable {
 
     private final URL url;
     private final Path downloadFolder;
+    private boolean ignoreErrors;
 
     /**
      * @param url            Root website url from where the images will be downloaded
@@ -33,6 +34,11 @@ public class ImageDownloader implements Runnable {
     public ImageDownloader(URL url, Path downloadFolder) {
         this.url = url;
         this.downloadFolder = downloadFolder;
+    }
+
+    public ImageDownloader(URL url, Path downloadFolder, boolean ignoreErrors) {
+        this(url, downloadFolder);
+        this.ignoreErrors = ignoreErrors;
     }
 
     @Override
@@ -50,6 +56,9 @@ public class ImageDownloader implements Runnable {
             try {
                 downloadImage(getImageFilename(imageDownloadUrl), imageDownloadUrl);
             } catch (IOException e) {
+                if (!ignoreErrors) {
+                    throw new RuntimeException(e);
+                }
                 log.error(e.getMessage());
             }
         }
